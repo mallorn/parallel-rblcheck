@@ -11,3 +11,8 @@ There are two options that must be set in the script:
 There are some RBLs commented out in the rbl-servers.txt list; these are RBLs that I didn't care about or are good RBLs that I didn't want creating output.
 
 A future version will probably expand the file with lists of good vs bad RBLs, what the return values mean, etc.
+
+The script requires 
+
+  Parallel::ForkManager
+  Net::DNS::Resolver
