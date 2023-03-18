@@ -14,5 +14,5 @@ A future version will probably expand the file with lists of good vs bad RBLs, w
 
 The script requires 
 
-  Parallel::ForkManager
-  Net::DNS::Resolver
+  * Parallel::ForkManager
+  * Net::DNS::Resolver
