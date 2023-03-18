@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Parallel::ForkManager;
+use Net::DNS::Resolver;
+use 5.10.0;
+
+my $ip = qq(xx.xx.xx.xx);
+my $max_processes = 200;
+my $rbl_file = 'rbl-servers.txt';
+
+open(my $fh, '<', $rbl_file) or die "Failed to open file: $!";
+my @rbl_sites = map { chomp; $_ } grep { !/^#/ } <$fh>;
+close($fh);
+
+my $pm = Parallel::ForkManager->new($max_processes);
+
+foreach my $rbl_site (@rbl_sites) {
+   $pm->start and next;
+
+   my $resolver = Net::DNS::Resolver->new;
+   my $queryhost = join('.', reverse(split('\.', $ip))) . '.' . $rbl_site;
+   my $query = $resolver->query($queryhost, 'A');
+   if ($query) {
+      foreach my $rr ($query->answer) {
+         if ($rr->address =~ /^127/) {
+            say qq($ip is listed at $rbl_site with value ), $rr->address;
+            last;
+         }
+      }
+   }
+   $pm->finish;
+}
+
+$pm->wait_all_children; # Wait for all child processes to finish
